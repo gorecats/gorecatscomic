@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @layer base {
+    :root {
+      --chart-1: 173 58% 39%;
+      --chart-2: 42 76% 61%;
+      --chart-3: 232 20% 54%;
+      --chart-4: 43 74% 66%;
+      --chart-5: 27 87% 67%;
+    }
+
+    .dark {
+      --chart-1: 220 70% 50%;
+      --chart-5: 160 60% 45%;
+      --chart-3: 30 80% 55%;
+      --chart-4: 280 65% 60%;
+      --chart-2: 340 75% 55%;
+    }
+  }
+
+  body {
+    @apply text-white;
+    @apply bg-grey-600;
+    @apply mb-0;
+    -webkit-font-smoothing: antialiased;
+    overflow-y: scroll;
+  }
+
+  body * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body *::selection {
+    background-color: #1929b8;
+  }
+
+  img {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    width: auto;
+    height: auto;
+  }
+
+  /* Scroll bar stylings */
+  ::-webkit-scrollbar {
+    @apply size-1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-grey-100;
+    @apply rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-grey-50;
+  }
+}
+
