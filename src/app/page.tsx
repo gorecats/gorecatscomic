@@ -10,10 +10,14 @@ import { useFetchComicPreview } from "@/queries/preview";
 import { WalletGateDialog } from "@/components/Wallet/WalletGateDialog";
 import { ButtonLink } from "@/components/ButtonLink";
 import { useLocalStorage } from "@/lib/useLocalStorage";
+import {
+  TransformWrapper,
+  TransformComponent,
+  ReactZoomPanPinchRef,
+} from "react-zoom-pan-pinch";
 
 export default function Page() {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  const [scale, setScale] = useState<number>(1.0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showWalletGateDialog, toggleWalletGateDialog] = useState(false);
@@ -25,6 +29,9 @@ export default function Page() {
   const [comicPages, setComicPages] = useState<string[] | undefined>();
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const { signMessage, publicKey, connected } = useWallet();
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  const transformRefs = useRef<Array<ReactZoomPanPinchRef | null>>([]);
 
   const [comicPagesCache, setComicPagesCache] = useLocalStorage<
     string[] | undefined
@@ -84,8 +91,10 @@ export default function Page() {
     );
 
     const text = await response.text();
-    if(response.status == 403){
-      alert("You're not authorized for full comic access, connect wallet that own gorecats to read full comic");
+    if (response.status == 403) {
+      alert(
+        "You're not authorized for full comic access, connect wallet that own gorecats to read full comic"
+      );
       return;
     }
     if (!response.ok) throw new Error("Failed to fetch images");
@@ -113,9 +122,6 @@ export default function Page() {
   const images = data ?? [];
   const totalImages = images.length;
 
-  const handleZoomIn = () => setScale((prev) => Math.min(prev + 0.25, 3.0));
-  const handleZoomOut = () => setScale((prev) => Math.max(prev - 0.25, 1));
-
   const toggleFullscreen = () => {
     if (!isFullscreen) {
       document.documentElement.requestFullscreen?.();
@@ -129,10 +135,7 @@ export default function Page() {
     if (!images.length) return;
 
     const container = scrollContainerRef.current;
-    if (!container) {
-      console.warn("❌ container is still null");
-      return;
-    }
+    if (!container) return;
 
     const handleScroll = () => {
       const images = container.querySelectorAll(".comic-image");
@@ -208,7 +211,7 @@ export default function Page() {
             <ButtonLink
               variant="ghost"
               className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-              href={"gorecats.io"}
+              href={"https://www.gorecats.io/"}
             >
               <X className="w-5 h-5 mr-2" />
               Exit Reader
@@ -226,25 +229,9 @@ export default function Page() {
             Page {currentImageIndex + 1}/{totalImages}
           </span>
           <div className="flex items-center space-x-2">
-            <Button
-              onClick={handleZoomOut}
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white"
-            >
-              <ZoomOut className="w-4 h-4" />
-            </Button>
             <span className="text-sm text-gray-300">
-              {Math.round(scale * 100)}%
+              {Math.round(zoomLevel * 100)}%
             </span>
-            <Button
-              onClick={handleZoomIn}
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </Button>
             <Button
               onClick={toggleFullscreen}
               variant="ghost"
@@ -272,17 +259,57 @@ export default function Page() {
             <div
               key={index}
               className="relative bg-white shadow-lg rounded-lg border-2 border-yellow-400 overflow-hidden"
+              style={{
+                maxHeight: "90vh",
+                height: "auto",
+                marginBottom: "1.5rem",
+              }}
             >
-              <img
-                src={imageUrl}
-                alt={`Comic page ${index + 1}`}
-                className="w-full h-auto object-contain comic-image"
-                style={{
-                  transform: `scale(${scale})`,
-                  transformOrigin: "center top",
-                  transition: "transform 0.2s ease-in-out",
+              <TransformWrapper
+                ref={(ref) => {
+                  transformRefs.current[index] = ref as ReactZoomPanPinchRef;
                 }}
-              />
+                minScale={1}
+                maxScale={4}
+                doubleClick={{ disabled: true }}
+                wheel={{ step: 50 }}
+                panning={{
+                  velocityDisabled: true,
+                  disabled: zoomLevel === 1,
+                }}
+                onZoom={(ref) => {
+                  if (index === currentImageIndex) {
+                    setZoomLevel(ref.state.scale);
+                  }
+                }}
+              >
+                <TransformComponent
+                  wrapperStyle={{
+                    width: "100%",
+                    height: "100%",
+                    overflow: zoomLevel > 1 ? "auto" : "visible",
+                    cursor: zoomLevel > 1 ? "grab" : "default",
+                  }}
+                  contentStyle={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`Comic page ${index + 1}`}
+                    draggable={false}
+                    className="select-none max-h-full comic-image"
+                    style={{
+                      userSelect: "none",
+                      pointerEvents: "auto",
+                    }}
+                  />
+                </TransformComponent>
+              </TransformWrapper>
+
               <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-mono z-10">
                 {index + 1}
               </div>

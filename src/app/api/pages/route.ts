@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     const TOTAL_PAGES = 22;
     const promises = [];
-    for (let i = 0; i <= TOTAL_PAGES; i++) {
+    for (let i = 0; i < TOTAL_PAGES; i++) {
       const paddedIndex = String(i).padStart(2, '0');
       const key = `gorecats/Gorecats_${paddedIndex}.jpg`;// or .png depending on your format
 
