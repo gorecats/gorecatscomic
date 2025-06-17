@@ -254,7 +254,7 @@ export default function Page() {
           toggleDialog={() => toggleWalletGateDialog(!showWalletGateDialog)}
           isLoading={isWalletAuthenticating}
         />
-        <div className="max-w-4xl mx-auto px-2 md:px-8 py-4 space-y-4 sm:space-y-6">
+        <div className="max-w-fit mx-auto px-2 md:px-8 py-4 space-y-4 sm:space-y-6">
           {images.map((imageUrl, index) => (
             <div
               key={index}
@@ -272,10 +272,29 @@ export default function Page() {
                 minScale={1}
                 maxScale={4}
                 doubleClick={{ disabled: true }}
-                wheel={{ step: 50 }}
+                wheel={{
+                  step: 50,
+                  wheelDisabled: false,
+                  touchPadDisabled: false,
+                }}
                 panning={{
                   velocityDisabled: true,
-                  disabled: zoomLevel === 1,
+                  disabled: true,
+                }}
+                pinch={{ disabled: false }}
+                zoomAnimation={{ disabled: true }}
+                onZoomStop={(ref) => {
+                  const newZoom = Math.max(1, ref.state.scale);
+                  if (ref.state.scale < 1) {
+                    ref.setTransform(
+                      1,
+                      ref.state.positionX,
+                      ref.state.positionY
+                    );
+                  }
+                  if (index === currentImageIndex) {
+                    setZoomLevel(newZoom);
+                  }
                 }}
                 onZoom={(ref) => {
                   if (index === currentImageIndex) {
@@ -287,14 +306,10 @@ export default function Page() {
                   wrapperStyle={{
                     width: "100%",
                     height: "100%",
-                    overflow: zoomLevel > 1 ? "auto" : "visible",
+                    maxHeight: "90vh",
                     cursor: zoomLevel > 1 ? "grab" : "default",
-                  }}
-                  contentStyle={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "start",
-                    width: "100%",
+                    overflow: "hidden",
+                    touchAction: "pan-y",
                   }}
                 >
                   <img
@@ -303,6 +318,10 @@ export default function Page() {
                     draggable={false}
                     className="select-none max-h-full comic-image"
                     style={{
+                      maxHeight: "90vh",
+                      width: "auto",
+                      height: "auto",
+                      objectFit: "contain",
                       userSelect: "none",
                       pointerEvents: "auto",
                     }}
