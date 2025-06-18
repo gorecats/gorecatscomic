@@ -85,8 +85,13 @@ async function validateWallet(address: string, encoding: string) {
   const isVerified = verifySignature(dataBytes, signatures, publicKeyBytes);
   if (!isVerified) return false;
 
-  const assets = await getAssetsByGroup("Exm6CUmtkNWvKywrkc7Cm4pYKxeJVjaYjiwVu8chr5R6", 1, 250);
-  return isVerified && assets.some((asset) => asset.ownership.owner == address);
+  const totalAssets : DAS.GetAssetResponse[] = [];
+  const common = await getAssetsByGroup("Fz81so5HVydupzxipmvNdrc4ojhQEs6ThaoVbDDHYD5g", 1, 150);
+  const rare = await getAssetsByGroup("GJ9rMWtrQdo1yaBscXzKXbX9Tsk4vyuo3Emcch6DddfH", 1, 60);
+  const legendary = await getAssetsByGroup("HvEoVhqvTEKGe5KJJHSWKW5W1uvgauSvfmf3KjuWh6JR", 1, 15);
+
+  totalAssets.push(...common, ...rare, ...legendary);
+  return totalAssets.some((asset) => asset.ownership.owner == address);
 }
 
 const getAssetsByGroup = async (
