@@ -24,6 +24,7 @@ export default function Page() {
   const [isWalletAuthenticating, toggleIsWalletAuthenticating] =
     useState(false);
   const hasShownDialogRef = useRef(false);
+  const [isDesktop, setIsDesktop] = useState(true);
 
   const [encoding, setEncoding] = useState<string>();
   const [comicPages, setComicPages] = useState<string[] | undefined>();
@@ -40,6 +41,7 @@ export default function Page() {
     "AuthTime",
     undefined
   );
+
   const {
     data: previewPages,
     isLoading,
@@ -67,6 +69,14 @@ export default function Page() {
       toggleWalletGateDialog(false);
     }
   };
+
+
+  useEffect(() => {
+    const checkScreen = () => setIsDesktop(window.innerWidth >= 768);
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
 
   async function fetchComicPages() {
     if (authTime) {
@@ -279,7 +289,7 @@ export default function Page() {
                 }}
                 panning={{
                   velocityDisabled: true,
-                  disabled: true,
+                  disabled: !(isDesktop && zoomLevel > 1),
                 }}
                 pinch={{ disabled: false }}
                 zoomAnimation={{ disabled: true }}
