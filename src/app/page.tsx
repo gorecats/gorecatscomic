@@ -280,7 +280,7 @@ export default function Page() {
                   transformRefs.current[index] = ref as ReactZoomPanPinchRef;
                 }}
                 minScale={1}
-                maxScale={4}
+                maxScale={10}
                 doubleClick={{ disabled: true }}
                 wheel={{
                   step: 50,
