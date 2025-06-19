@@ -18,7 +18,7 @@ export const WalletGateDialog: React.FC<Props> = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={toggleDialog}>
-      <DialogContent className="items-center max-w-fit sm:min-w-fit p-0 bg-transparent xs:min-w-full">
+      <DialogContent className="items-center max-w-fit sm:min-w-fit p-0 bg-transparent xs:min-w-full min-h-[35vh]">
         <WalletGate handleReadAuthorization={handleReadAuthorization} isLoading={isLoading}/>
         <DialogTitle></DialogTitle>
       </DialogContent>

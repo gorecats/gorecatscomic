@@ -11,25 +11,33 @@ export function WalletGate({
   isLoading
 }: {
   handleReadAuthorization: () => void;
-  isLoading: boolean
+  isLoading: boolean;
 }) {
   const { connected } = useWallet();
-  
+
   return (
-    <Card className="max-w-md mx-auto rounded-2xl shadow-md border border-muted p-6 bg-background text-center space-y-4">
-      <h2 className="text-xl font-semibold">Verify Your Wallet</h2>
-      <p className="text-sm text-muted-foreground">
-        Holders of the{" "}
-        <span className="font-medium text-foreground">Gorecats Cover NFT</span>{" "}
-        can unlock full access.
-      </p>
-      <CardContent>
+    <Card className="bg-white dark:bg-zinc-900 max-w-md mx-auto rounded-3xl shadow-xl border border-muted p-8 text-center flex flex-col justify-between">
+      <div className="space-y-3">
+        <h2 className="text-2xl font-bold text-black dark:text-white">Verify Your Wallet</h2>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          Holders of the{" "}
+          <span className="font-medium text-black dark:text-white">Gorecats Cover NFT</span>{" "}
+          can unlock full access.
+        </p>
+      </div>
+
+      <CardContent className="pt-4">
         {connected ? (
-          <Button onClick={handleReadAuthorization} className="w-full">
-            {isLoading ? <Loader2Icon /> : "Authenticate & Read"}
+          <Button
+            onClick={handleReadAuthorization}
+            className="w-full h-11 flex items-center justify-center gap-2 text-base"
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2Icon className="w-4 h-4 animate-spin" />}
+            Authenticate & Read
           </Button>
         ) : (
-          <ConnectWalletButton />
+          <ConnectWalletButton className="w-full h-11 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition" />
         )}
       </CardContent>
     </Card>

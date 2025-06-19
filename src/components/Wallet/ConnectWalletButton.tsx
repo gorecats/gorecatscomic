@@ -71,13 +71,6 @@ export const ConnectWalletButton: React.FC<Props> = ({ onClick, triggerReconnect
   }, [buttonState, onClick, onConnect, onDisconnect, onSelectWallet, triggerReconnect])
 
   useEffect(() => {
-    if ( buttonState == 'no-wallet' && onSelectWallet) {
-      onSelectWallet()
-      setActionTriggered(true)
-    }
-  }, [buttonState, onSelectWallet])
-
-  useEffect(() => {
     if (buttonState == 'has-wallet' && onConnect) {
       onConnect()
       setActionTriggered(true)
